@@ -1,2 +1,2 @@
-kilo: main.cpp
-	g++ main.cpp -o kilo -Wall -Wextra -pedantic -std=c++11
+atto: main.cpp
+	g++ main.cpp -o atto -Wall -Wextra -pedantic -std=c++11
