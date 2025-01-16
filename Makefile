@@ -1,2 +1,2 @@
 atto: main.c
-	gcc main.cpp -o atto -Wall -Wextra -pedantic -std=c99
+	gcc main.c -o atto -Wall -Wextra -pedantic -std=c99
