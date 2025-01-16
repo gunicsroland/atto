@@ -58,13 +58,25 @@ char editorReadKey(){
 	return c;
 }
 
+/*** output ***/
+
+void editorRefreshScreen() {
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+	write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
 /*** input ***/
 
 void editorProcessKeypress() {
 	char c = editorReadKey();
 	switch (c) {
 		case CTRL_KEY('q'):
+			write(STDOUT_FILENO, "\x1b[2J", 4);
+			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
+			break;
+		default:
+			printf("%d\r\n", c);
 			break;
 	}
 }
@@ -72,20 +84,11 @@ void editorProcessKeypress() {
 /*** init ***/
 
 int main() {
+	editorRefreshScreen();
 	enableRawMode();	
 
-	char c;
 	while (1){
-		c = '\0';
-		if(read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN)
-			die("read");
-		if(iscntrl(c)){
-			printf("%d\r\n", c);
-		}
-		else{
-			printf("%d ('%c')\r\n", c, c);
-		}
-		if(c == CTRL_KEY('q')) break;
+		editorProcessKeypress();
 	}
 	return 0;
 }
