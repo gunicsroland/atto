@@ -18,7 +18,7 @@
 
 /*** defines ***/
 
-#define ATTO_VERSION "0.0.65"
+#define ATTO_VERSION "0.0.100"
 #define ATTO_TAB_STOP 8
 
 #define CTRL_KEY(k) ((k) & 0x1f)
