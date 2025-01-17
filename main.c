@@ -17,7 +17,7 @@
 /*** defines ***/
 
 #define CTRL_KEY(k) ((k) & 0x1f)
-#define ATTO_VERSION "0.0.41"
+#define ATTO_VERSION "0.0.65"
 
 enum editorKey {
 	ARROW_LEFT = 1000,
