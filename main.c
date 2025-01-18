@@ -373,6 +373,7 @@ void editorOpen(char *filename) {
 	E.filename = strdup(filename);
 
 	FILE *fp = fopen(filename, "r");
+	if (!fp) fp = fopen(filename, "a");
 	if (!fp) die("fopen");
 
 	char *line = NULL;
