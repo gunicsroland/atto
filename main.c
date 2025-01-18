@@ -229,11 +229,11 @@ void editorUpdateRow(erow *row) {
 	row->rsize = idx;
 }
 
-void editorInsertRow(int at, har *s, size_t len) b
-	if (at < 0 || numrows < at) return;
+void editorInsertRow(int at, char *s, size_t len) {
+	if (at < 0 || E.numrows < at) return;
 
 	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
-	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at);
+	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
 	E.row[at].size = len;
 	E.row[at].chars = malloc(len + 1);
