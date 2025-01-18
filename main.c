@@ -19,7 +19,7 @@
 
 /*** defines ***/
 
-#define ATTO_VERSION "0.0.100"
+#define ATTO_VERSION "0.0.125"
 #define ATTO_TAB_STOP 8
 #define ATTO_QUIT_TIMES 2
 
@@ -233,7 +233,7 @@ void editorInsertRow(int at, char *s, size_t len) {
 	if (at < 0 || E.numrows < at) return;
 
 	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
-	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
+	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at))mak;
 
 	E.row[at].size = len;
 	E.row[at].chars = malloc(len + 1);
