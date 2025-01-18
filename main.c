@@ -64,6 +64,10 @@ struct editorConfig{
 
 struct editorConfig E;
 
+/*** prototypes ***/
+
+void setStatusMessage(const chat *fmt, ...);
+
 /*** terminal ***/
 
 void die(const char *s){
@@ -306,10 +310,20 @@ void editorSave() {
 	char *buf = editorRowsToString(&len);
 
 	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
-	ftruncate(fd, len);
-	write(fd, buf, len);
-	close(fd);
+	if (fd != -1) {
+		if (ftruncate(fd, len) != -1) {
+			if(write(fd, buf, len) == len) {
+				close(fd);
+				free(buf);
+				editorSetStatusMessage("%d bytes written to disk", len);
+				return;
+			}
+		}
+		close(fd);
+	}
+
 	free(buf);
+	editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 
 /*** append buffer ***/
@@ -420,7 +434,7 @@ void editorDrawMessageBar(struct abuf *ab) {
 	abAppend(ab, "\x1b[K", 3);
 	int msglen = strlen(E.statusmsg);
 	if(msglen > E.screencols) msglen = E.screencols;
-	if(msglen && time(NULL) - E.statusmsg_time < 5)
+	if(msglen)
 		abAppend(ab, E.statusmsg, msglen);
 }
 
