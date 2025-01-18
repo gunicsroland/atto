@@ -209,7 +209,7 @@ int editorRowCxToRx(erow *row, int cx) {
 }
 
 int editorRowRxToCx(erow *row, int rx) {
-	int cur_rx = 0.
+	int cur_rx = 0;
 	int cx;
 	for (cx = 0; cx < row->size; cx++) {
 		if (row->chars[cx] == '\t')
@@ -248,7 +248,7 @@ void editorInsertRow(int at, char *s, size_t len) {
 	if (at < 0 || E.numrows < at) return;
 
 	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
-	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at))mak;
+	memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
 	E.row[at].size = len;
 	E.row[at].chars = malloc(len + 1);
@@ -391,7 +391,7 @@ void editorOpen(char *filename) {
 void editorSave() {
 	if (E.filename == NULL) {
 		E.filename = editorPrompt("Save as: %s");
-		if (E.filename = NULL) {
+		if (E.filename == NULL) {
 			editorSetStatusMessage("Save aborted");
 			return;
 		}
@@ -430,7 +430,7 @@ void editorFind() {
 		char *match = strstr(row->render, query);
 		if (match) {
 			E.cy = i;
-			E.cx = editorTowRxToCx(row, match - row->render);
+			E.cx = editorRowRxToCx(row, match - row->render);
 			E.rowoff = E.numrows;
 			break;
 		}
@@ -601,7 +601,7 @@ char *editorPrompt(char *prompt) {
 			if (buflen != 0) buf[--buflen] = '\0';
 		}
 		else if (c == '\x1b') {
-			editosetStatusMessage("");
+			editorSetStatusMessage("");
 			free(buf);
 			return NULL;
 		}
@@ -612,11 +612,11 @@ char *editorPrompt(char *prompt) {
 			}
 		}
 		else if (!iscntrl(c) && c < 128) {
-			if (buflen == buffsize - 1) {
-				buffsize *= 2;
+			if (buflen == bufsize - 1) {
+				bufsize *= 2;
 				buf = realloc(buf, bufsize);
 			}
-			buf[buflenn++] = c;
+			buf[buflen++] = c;
 			buf[buflen] = '\0';
 		}
 	}
