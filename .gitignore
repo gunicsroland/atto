@@ -2,4 +2,6 @@
 *.out
 *.o
 *.exe
+atto
+main2.c
 testFile
