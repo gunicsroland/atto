@@ -84,6 +84,7 @@ struct editorConfig{
 	int screencols;
 	int numrows;
 	erow *row;
+	int num_width;
 	int dirty;
 	char *filename;
 	char statusmsg[80];
@@ -408,6 +409,16 @@ void editorSelectSyntaxHighlight() {
 
 /*** row operations ***/
 
+int editorGetNumLen(int num) {
+	int l = 1;
+	while (num > 9) {
+		l++;
+		num /= 10;
+	}
+	
+	return l;
+}
+
 int editorRowCxToRx(erow *row, int cx) {
 	int rx = 0;
 	int j = 0;
@@ -480,6 +491,8 @@ void editorInsertRow(int at, char *s, size_t len) {
 
 	E.numrows++;
 	E.dirty++;
+
+	E.num_width = editorGetNumLen(E.numrows - 1);
 }
 
 void editorFreeRow(erow *row) {
@@ -609,6 +622,7 @@ void editorOpen(char *filename) {
 	}
 	free(line);
 	fclose(fp);
+	E.num_width = editorGetNumLen(E.numrows - 1);
 	E.dirty = 0;
 }
 
@@ -793,6 +807,12 @@ void editorDrawRows(struct abuf *ab) {
 			int current_color = -1;
 			int j;
 
+			char line_num_buf[50];
+			int line_num_len = snprintf(line_num_buf, sizeof(line_num_buf), "%*d ", E.num_width, filerow);
+			abAppend(ab, "\x1b[90m", 5);
+			abAppend(ab, line_num_buf, line_num_len);
+			abAppend(ab, "\x1b[39m", 5);
+
 			for (j = 0; j < len; j++) {
 				if (iscntrl(c[j])) {
 					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
@@ -879,7 +899,7 @@ void editorRefreshScreen() {
 
 	char buf[32];
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy - E.rowoff + 1, 
-						  E.rx - E.coloff + 1);
+						  E.rx - E.coloff + 1 + E.num_width + 1);
 	abAppend(&ab, buf, strlen(buf));
 
 	abAppend(&ab, "\x1b[?25h", 6);
@@ -1065,6 +1085,7 @@ void initEditor() {
 	E.coloff = 0;
 	E.numrows = 0;
 	E.row = NULL;
+	E.num_width = 1;
 	E.dirty = 0;
 	E.filename = NULL;
 	E.statusmsg[0] = '\0';
