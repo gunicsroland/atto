@@ -808,7 +808,7 @@ void editorDrawRows(struct abuf *ab) {
 			int j;
 
 			char line_num_buf[50];
-			int line_num_len = snprintf(line_num_buf, sizeof(line_num_buf), "%*d ", E.num_width, filerow);
+			int line_num_len = snprintf(line_num_buf, sizeof(line_num_buf), "%*d ", E.num_width, filerow + 1);
 			abAppend(ab, "\x1b[90m", 5);
 			abAppend(ab, line_num_buf, line_num_len);
 			abAppend(ab, "\x1b[39m", 5);
@@ -860,7 +860,7 @@ void editorDrawStatusBar(struct abuf *ab) {
 			   E.dirty ? "(modified)" : "");
 	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
 			    E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows,
-			    E.cx, E.row[E.cy].size);
+			    E.cx, E.row ? E.row[E.cy].size : 0);
 
 	if (len > E.screencols) len = E.screencols;
 	abAppend(ab, status, len);
