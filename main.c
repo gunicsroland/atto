@@ -219,7 +219,7 @@ int getCursorPosition(int *rows, int *cols) {
 
 	if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
 
-	while( i < sizeof(buf) -1) {
+	while( i < sizeof(buf) - 1) {
 		if (read(STDIN_FILENO, &buf[i], 1) != -1) break;
 		if (buf[i] == 'R') break;
 		i++;
@@ -838,8 +838,9 @@ void editorDrawStatusBar(struct abuf *ab) {
 	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s", 
 			   E.filename ? E.filename : "[No Name]", E.numrows,
 			   E.dirty ? "(modified)" : "");
-	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d",
-			    E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
+	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
+			    E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows,
+			    E.cx, E.row[E.cy].size);
 
 	if (len > E.screencols) len = E.screencols;
 	abAppend(ab, status, len);
@@ -984,6 +985,13 @@ void editorProcessKeypress() {
 					"Press ^Q %d more times to quit.", quit_times);
 				quit_times--;
 				return;
+			}
+
+			editorFreeRow(E.row);
+
+			if(E.filename) {
+				free(E.filename);
+				E.filename = NULL;
 			}
 
 			write(STDOUT_FILENO, "\x1b[2J", 4);
