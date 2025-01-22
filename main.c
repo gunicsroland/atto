@@ -729,6 +729,21 @@ void editorFind() {
 	}
 }
 
+void editorFindLine() {
+	char *query = editorPrompt("Searc Line: %s (Use Esc/Enter)", NULL);
+	if (query == NULL) return;
+	
+	int num;
+	if (sscanf(query, "%d", &num) != 1) return;
+	if (num > E.numrows) num =  E.numrows;
+
+	E.cy = num - 1;
+	E.cx = 0;
+	E.rowoff = E.numrows;
+
+	free(query);
+}
+
 /*** append buffer ***/
 
 struct abuf {
@@ -1064,6 +1079,7 @@ void editorProcessKeypress() {
 			break;
 
 		case CTRL_KEY('l'):
+			editorFindLine();
 		case '\x1b':
 			break;
 		
@@ -1104,7 +1120,7 @@ int main(int argc, char *argv[]) {
 		editorOpen(argv[1]);
 	}
 
-	editorSetStatusMessage("^Q - quit  ^S - Save  ^F - Find");
+	editorSetStatusMessage("^Q - quit  ^S - Save  ^F - Find  ^L - Line");
 
 	while (1){
 		editorRefreshScreen();
