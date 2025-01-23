@@ -494,7 +494,7 @@ void editorInsertRow(int at, char *s, size_t len) {
 	E.numrows++;
 	E.dirty++;
 
-	E.num_width = editorGetNumLen(E.numrows - 1);
+	E.num_width = editorGetNumLen(E.numrows);
 }
 
 void editorFreeRow(erow *row) {
@@ -510,6 +510,8 @@ void editorDelRow(int at) {
 	for (int j = at; j < E.numrows - 1; j++) E.row[j].idx--;
 	E.numrows--;
 	E.dirty++;
+
+	E.num_width = editorGetNumLen(E.numrows);
 }
 
 void editorRowInsertChar(erow *row, int at, int c) {
