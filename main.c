@@ -277,6 +277,7 @@ void editorUpdateSyntax(erow *row) {
 	while(i < row->rsize) {
 		char c = row->render[i];
 		unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
+		char prev_c = (i > 0) ? row->render[i - 1] : '\0';
 
 		if (scs_len && !in_string && !in_comment) {
 			if (!strncmp(&row->render[i], scs, scs_len)) {
@@ -330,7 +331,8 @@ void editorUpdateSyntax(erow *row) {
 		}
 		if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
 			if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
-			    (c == '.' && prev_hl == HL_NUMBER)) {
+			    (c == '.' && prev_hl == HL_NUMBER)||
+          		(c == 'x' && prev_hl == HL_NUMBER && prev_c == '0')) {
 				row->hl[i] = HL_NUMBER;
 				i++;
 				prev_sep = 0;
