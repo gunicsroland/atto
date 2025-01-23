@@ -521,6 +521,8 @@ void editorRowInsertChar(erow *row, int at, int c) {
 }
 
 void editorRowAppendString(erow *row, char *s, size_t len) {
+	if (len == 0) return;
+
 	row->chars = realloc(row->chars, row->size + len + 1);
 	memcpy(&row->chars[row->size], s, len);
 	row->size += 1;
@@ -830,7 +832,7 @@ void editorDrawRows(struct abuf *ab) {
 
 			for (j = 0; j < len; j++) {
 				if (iscntrl(c[j])) {
-					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
+					char sym = (c[j] <= 26) ? '@'+ c[j] : '?';
 					abAppend(ab, "\x1b[7m", 4);
 					abAppend(ab, &sym, 1);
 					abAppend(ab, "\x1b[m", 3);
@@ -873,9 +875,9 @@ void editorDrawStatusBar(struct abuf *ab) {
 	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s", 
 			   E.filename ? E.filename : "[No Name]", E.numrows,
 			   E.dirty ? "(modified)" : "");
-	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
+	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%s",
 			    E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows,
-			    E.cx, E.row ? E.row[E.cy].size : 0);
+			    E.cx, E.row ? E.row[E.cy].chars : 0);
 
 	if (len > E.screencols) len = E.screencols;
 	abAppend(ab, status, len);
