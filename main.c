@@ -1026,7 +1026,7 @@ void editorProcessKeypress() {
 				return;
 			}
 
-			editorFreeRow(E.row);
+			if(E.row) editorFreeRow(E.row);
 
 			if(E.filename) {
 				free(E.filename);
