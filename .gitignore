@@ -1,7 +1,7 @@
 /build/
 *.out
 *.o
+*.txt
 *.exe
 atto
-main2.c
-testFile
+kilo.c
