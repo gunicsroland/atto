@@ -126,7 +126,7 @@ char *C_HL_keywords[] = {"switch",
 
 struct editorSyntax HLDB[] = {
     {"c", C_HL_extensions, C_HL_keywords, "//", "/*", "*/",
-     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS},
+     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS}
 };
 
 #define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
@@ -785,13 +785,14 @@ void editorFind() {
 }
 
 void editorFindLine() {
-  char *query = editorPrompt("Searc Line: %s (Use Esc/Enter)", NULL);
-  if (query == NULL)
+  char *query = editorPrompt("Search Line Number: %s (Use Esc/Enter)", NULL);
+  if (query == NULL || E.numrows == 0 )
     return;
 
   int num;
   if (sscanf(query, "%d", &num) != 1)
     return;
+  if (num <= 0) return;
   if (num > E.numrows)
     num = E.numrows;
 
@@ -932,9 +933,9 @@ void editorDrawStatusBar(struct abuf *ab) {
   int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
                      E.filename ? E.filename : "[No Name]", E.numrows,
                      E.dirty ? "(modified)" : "");
-  int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%s",
+  int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
                       E.syntax ? E.syntax->filetype : "no ft", E.cy + 1,
-                      E.numrows, E.cx, E.row ? E.row[E.cy].chars : 0);
+                      E.numrows, E.cx, E.row ? E.row[E.cy].size : 0);
 
   if (len > E.screencols)
     len = E.screencols;
