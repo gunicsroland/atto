@@ -5,6 +5,7 @@
 #define _GNU_SOURCE
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
@@ -93,6 +94,12 @@ struct editorConfig {
 };
 
 struct editorConfig E;
+
+/*** functions ***/
+
+bool isHexaDigit(char c) {
+	return ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'); 
+}
 
 /*** filetypes ***/
 
