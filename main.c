@@ -362,10 +362,20 @@ void editorUpdateSyntax(erow *row) {
         }
       }
     }
+
     if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
       if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
           (c == '.' && prev_hl == HL_NUMBER) ||
-          (c == 'x' && prev_hl == HL_NUMBER && prev_c == '0')) {
+          (c == 'x' && prev_hl == HL_NUMBER && prev_c == '0') ||
+	  (c == 'b' && prev_hl == HL_NUMBER && prev_c == '0') ||
+	  (isHexaDigit(c) && prev_hl == HL_NUMBER)) {
+        row->hl[i] = HL_NUMBER;
+        i++;
+        prev_sep = 0;
+        continue;
+      }
+      if ((isdigit(c) && prev_c == 'o')) {
+	row->hl[i-1] = HL_NUMBER;
         row->hl[i] = HL_NUMBER;
         i++;
         prev_sep = 0;
