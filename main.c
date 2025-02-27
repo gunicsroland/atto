@@ -376,10 +376,10 @@ void editorUpdateSyntax(erow *row) {
       }
       if ((isdigit(c) && prev_c == 'o')) {
 	row->hl[i-1] = HL_NUMBER;
-        row->hl[i] = HL_NUMBER;
-        i++;
-        prev_sep = 0;
-        continue;
+	row->hl[i] = HL_NUMBER;
+	i++;
+	prev_sep = 0;
+	continue;
       }
     }
 
