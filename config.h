@@ -3,7 +3,7 @@
 
 /*** defines ***/
 
-#define ATTO_VERSION "0.1.59"
+#define ATTO_VERSION "0.2.0"
 #define ATTO_TAB_STOP 8
 #define ATTO_QUIT_TIMES 2
 
