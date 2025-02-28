@@ -23,9 +23,6 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-#define HL_HIGHLIGHT_NUMBERS (1 << 0)
-#define HL_HIGHLIGHT_STRINGS (1 << 1)
-
 enum editorKey {
   BACKSPACE = 127,
   ARROW_LEFT = 1000,
