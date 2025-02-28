@@ -40,14 +40,14 @@ enum editorKey {
 };
 
 enum editorHighlight {
-  HL_NORMAL = 0,
-  HL_COMMENT,
-  HL_MLCOMMENT,
-  HL_KEYWORD1,
-  HL_KEYWORD2,
-  HL_STRING,
-  HL_NUMBER,
-  HL_MATCH
+  HL_NORMAL = 37,
+  HL_COMMENT = 36,
+  HL_MLCOMMENT = 36,
+  HL_KEYWORD1 = 33,
+  HL_KEYWORD2 = 32,
+  HL_STRING = 35,
+  HL_NUMBER = 31,
+  HL_MATCH = 34
 };
 
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
@@ -414,25 +414,6 @@ void editorUpdateSyntax(erow *row) {
     editorUpdateSyntax(&E.row[row->idx + 1]);
 }
 
-int editorSyntaxToColor(int hl) {
-  switch (hl) {
-  case HL_COMMENT:
-  case HL_MLCOMMENT:
-    return 36;
-  case HL_KEYWORD1:
-    return 33;
-  case HL_KEYWORD2:
-    return 32;
-  case HL_STRING:
-    return 35;
-  case HL_NUMBER:
-    return 31;
-  case HL_MATCH:
-    return 34;
-  default:
-    return 37;
-  }
-}
 
 void editorSelectSyntaxHighlight() {
   E.syntax = NULL;
@@ -925,7 +906,7 @@ void editorDrawRows(struct abuf *ab) {
           }
           abAppend(ab, &c[j], 1);
         } else {
-          int color = editorSyntaxToColor(hl[j]);
+          int color = hl[j];
           if (color != current_color) {
             current_color = color;
             char buf[16];
