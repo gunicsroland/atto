@@ -17,14 +17,14 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+#include "config.h"
 
 /*** defines ***/
 
-#define ATTO_VERSION "0.1.59"
-#define ATTO_TAB_STOP 8
-#define ATTO_QUIT_TIMES 2
-
 #define CTRL_KEY(k) ((k) & 0x1f)
+
+#define HL_HIGHLIGHT_NUMBERS (1 << 0)
+#define HL_HIGHLIGHT_STRINGS (1 << 1)
 
 enum editorKey {
   BACKSPACE = 127,
@@ -39,31 +39,7 @@ enum editorKey {
   PAGE_DOWN
 };
 
-enum editorHighlight {
-  HL_NORMAL = 37,
-  HL_COMMENT = 36,
-  HL_MLCOMMENT = 36,
-  HL_KEYWORD1 = 33,
-  HL_KEYWORD2 = 32,
-  HL_STRING = 35,
-  HL_NUMBER = 31,
-  HL_MATCH = 34
-};
-
-#define HL_HIGHLIGHT_NUMBERS (1 << 0)
-#define HL_HIGHLIGHT_STRINGS (1 << 1)
-
 /*** data ***/
-
-struct editorSyntax {
-  char *filetype;
-  char **filematch;
-  char **keywords;
-  char *singleline_comment_start;
-  char *multiline_comment_start;
-  char *multiline_comment_end;
-  int flags;
-};
 
 typedef struct erow {
   int idx;
@@ -100,43 +76,6 @@ struct editorConfig E;
 bool isHexaDigit(char c) {
 	return ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'); 
 }
-
-/*** filetypes ***/
-
-char *C_HL_extensions[] = {".c", ".h", ".cpp", NULL};
-
-char *C_HL_keywords[] = {"switch",
-                         "if",
-                         "while",
-                         "for",
-                         "break",
-                         "continue",
-                         "return",
-                         "else",
-                         "struct",
-                         "union",
-                         "typedef",
-                         "static",
-                         "enum",
-                         "class",
-                         "case",
-
-                         "int|",
-                         "long|",
-                         "double|",
-                         "float|",
-                         "char|",
-                         "unsigned|"
-                         "signed|",
-                         "coid|",
-                         NULL};
-
-struct editorSyntax HLDB[] = {
-    {"c", C_HL_extensions, C_HL_keywords, "//", "/*", "*/",
-     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS}
-};
-
-#define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
 
 /*** prototypes ***/
 
@@ -1189,6 +1128,7 @@ int main(int argc, char *argv[]) {
   }
 
   editorSetStatusMessage("^Q - quit  ^S - Save  ^F - Find  ^L - Line");
+
 
   while (1) {
     editorRefreshScreen();
