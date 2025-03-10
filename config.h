@@ -14,14 +14,14 @@
 // based on ansii escape sequences
 
 enum editorHighlight {
-  HL_NORMAL = 37,
-  HL_COMMENT = 36,
-  HL_MLCOMMENT = 36,
-  HL_KEYWORD1 = 33,
-  HL_KEYWORD2 = 32,
-  HL_STRING = 35,
-  HL_NUMBER = 31,
-  HL_MATCH = 34
+  HL_NORMAL = 7,
+  HL_COMMENT = 6,
+  HL_MLCOMMENT = 6,
+  HL_KEYWORD1 = 3,
+  HL_KEYWORD2 = 2,
+  HL_STRING = 5,
+  HL_NUMBER = 1,
+  HL_MATCH = 4
 };
 
 struct editorSyntax {
