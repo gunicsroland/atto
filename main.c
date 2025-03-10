@@ -832,12 +832,12 @@ void editorDrawRows(struct abuf *ab) {
           abAppend(ab, "\x1b[m", 3);
           if (current_color != -1) {
             char buf[16];
-            int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_color);
+            int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", current_color);
             abAppend(ab, buf, clen);
           }
         } else if (hl[j] == HL_NORMAL) {
           if (current_color != -1) {
-            abAppend(ab, "\x1b[39m", 5);
+            abAppend(ab, "\x1b[39;49m", 8);
             current_color = -1;
           }
           abAppend(ab, &c[j], 1);
@@ -846,7 +846,7 @@ void editorDrawRows(struct abuf *ab) {
           if (color != current_color) {
             current_color = color;
             char buf[16];
-            int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+            int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", color);
             abAppend(ab, buf, clen);
           }
           abAppend(ab, &c[j], 1);
