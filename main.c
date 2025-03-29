@@ -462,6 +462,7 @@ void editorInsertRow(int at, char *s, size_t len) {
   E.row[at].render = NULL;
   E.row[at].hl = NULL;
   E.row[at].hl_open_comment = 0;
+
   editorUpdateRow(&E.row[at]);
 
   E.numrows++;
@@ -560,8 +561,21 @@ void editorInsertNewLine() {
     row->chars[row->size] = '\0';
     editorUpdateRow(row);
   }
+
+  int tabs = 0;
+  if (E.cy >= 0) {
+    tabs = 0;
+    for (int j = 0; j < E.row[E.cy].size; j++)
+      if (E.row[E.cy].chars[j] == '\t')
+        tabs++;
+
+    for (int j = 0; j < tabs; j++) {
+      editorRowInsertChar(&E.row[E.cy+1], 0, '\t');
+    }
+  }
+
   E.cy++;
-  E.cx = 0;
+  E.cx = tabs;
 }
 
 /*** file i/o ***/
