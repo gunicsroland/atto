@@ -96,6 +96,7 @@ char *CPP_HL_keywords[] = {"switch",
 			 "private",
 			 "protected",
 			 "template",
+			 "operator",
 			
 
                          "int|",

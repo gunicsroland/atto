@@ -219,7 +219,7 @@ int getWindowSize(int *rows, int *cols) {
 /*** syntax highlighting ***/
 
 int is_separator(int c) {
-  return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];{}", c) != NULL;
+  return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];:{}", c) != NULL;
 }
 
 void editorUpdateSyntax(erow *row) {
@@ -1010,8 +1010,8 @@ void editorMoveCursor(int key) {
 void editorProcessKeypress() {
   static int quit_times = ATTO_QUIT_TIMES;
   int c = editorReadKey();
-
   switch (c) {
+  
   case '\r':
     editorInsertNewLine();
     break;
@@ -1037,6 +1037,7 @@ void editorProcessKeypress() {
     write(STDOUT_FILENO, "\x1b[H", 3);
     exit(0);
     break;
+  
   case CTRL_KEY('s'):
     editorSave();
     break;
