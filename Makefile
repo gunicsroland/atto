@@ -1,5 +1,5 @@
 CC      := gcc
-CFLAGS  := -Wall -Wextra -pedantic -std=c99 -Iinclude
+CFLAGS  := -Wall -Wextra -pedantic -Iinclude -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_GNU_SOURCEde 
 SRC_DIR := src
 OBJ_DIR := obj
 TARGET  := atto
