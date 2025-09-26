@@ -21,4 +21,15 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 	@echo "Created directory: $(OBJ_DIR)"
 
-.PHONY: all clean
+clean:
+	rm -rf $(OBJ_DIR) $(TARGET)
+
+# Run clang-format (in-place)
+format:
+	clang-format -i $(SRCS) include/*.h
+
+# Run clang-tidy
+tidy:
+	clang-tidy $(SRCS) -- -Iinclude $(CFLAGS)
+
+.PHONY: all clean format tidy
