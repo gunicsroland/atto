@@ -4,8 +4,7 @@
 #include "data.h"
 
 int is_separator(int c);
-void editorUpdateSyntax(erow *row);
+void editorUpdateSyntax(erow* row);
 void editorSelectSyntaxHighlight();
-
 
 #endif
