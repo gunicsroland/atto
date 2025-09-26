@@ -14,59 +14,9 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <termios.h>
 #include <time.h>
 #include <unistd.h>
 #include "config.h"
-
-/*** defines ***/
-
-#define CTRL_KEY(k) ((k) & 0x1f)
-
-enum editorKey {
-  BACKSPACE = 127,
-  ARROW_LEFT = 1000,
-  ARROW_RIGHT,
-  ARROW_UP,
-  ARROW_DOWN,
-  DEL_KEY,
-  HOME_KEY,
-  END_KEY,
-  PAGE_UP,
-  PAGE_DOWN
-};
-
-/*** data ***/
-
-typedef struct erow {
-  int idx;
-  int size;
-  int rsize;
-  char *chars;
-  char *render;
-  unsigned char *hl;
-  int hl_open_comment;
-} erow;
-
-struct editorConfig {
-  int cx, cy;
-  int rx;
-  int rowoff;
-  int coloff;
-  int screenrows;
-  int screencols;
-  int numrows;
-  erow *row;
-  int num_width;
-  int dirty;
-  char *filename;
-  char statusmsg[80];
-  time_t statusmsg_time;
-  struct editorSyntax *syntax;
-  struct termios orig_termios;
-};
-
-struct editorConfig E;
 
 /*** functions ***/
 
@@ -753,13 +703,9 @@ void editorFindLine() {
 
 /*** append buffer ***/
 
-struct abuf {
-  char *b;
-  int len;
-};
 
-#define ABUF_INIT                                                              \
-  { NULL, 0 }
+
+
 
 void abAppend(struct abuf *ab, const char *s, int len) {
   char *new = realloc(ab->b, ab->len + len);
@@ -1112,39 +1058,4 @@ void editorProcessKeypress() {
 
 /*** init ***/
 
-void initEditor() {
-  E.cx = 0;
-  E.cy = 0;
-  E.rx = 0;
-  E.rowoff = 0;
-  E.coloff = 0;
-  E.numrows = 0;
-  E.row = NULL;
-  E.num_width = 1;
-  E.dirty = 0;
-  E.filename = NULL;
-  E.statusmsg[0] = '\0';
-  E.statusmsg_time = 0;
-  E.syntax = NULL;
 
-  if (getWindowSize(&E.screenrows, &E.screencols) == -1)
-    die("getWindowSize");
-  E.screenrows -= 2;
-}
-
-int main(int argc, char *argv[]) {
-  enableRawMode();
-  initEditor();
-  if (argc >= 2) {
-    editorOpen(argv[1]);
-  }
-
-  editorSetStatusMessage("^Q - quit  ^S - Save  ^F - Find  ^L - Line");
-
-
-  while (1) {
-    editorRefreshScreen();
-    editorProcessKeypress();
-  }
-  return 0;
-}
