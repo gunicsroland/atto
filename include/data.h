@@ -34,6 +34,8 @@ struct editorConfig {
   struct termios orig_termios;
 };
 
+extern struct editorConfig E;
+
 /*** defines ***/
 
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -50,7 +52,5 @@ enum editorKey {
   PAGE_UP,
   PAGE_DOWN
 };
-
-struct editorConfig E;
 
 #endif

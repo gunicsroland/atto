@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <termios.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/ioctl.h> 
 
 
 void die(const char *s) {

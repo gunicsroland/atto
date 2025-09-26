@@ -1,4 +1,8 @@
 #include "../include/data.h"
+#include "../include/terminal.h"
+#include "../include/file_io.h"
+#include "../include/editor_o.h"
+#include "../include/editor_i.h"
 
 struct editorConfig E;
 
@@ -17,7 +21,7 @@ void initEditor() {
   E.statusmsg_time = 0;
   E.syntax = NULL;
 
-  if (getWindowSize(&E.screenrows, &E.screencols) == -1)
+if (getWindowSize(&E.screenrows, &E.screencols) == -1)
     die("getWindowSize");
   E.screenrows -= 2;
 }

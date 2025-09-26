@@ -46,6 +46,6 @@ extern const char *CPP_HL_keywords[];
 
 extern struct editorSyntax HLDB[];
 
-#define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
+extern size_t HLDB_ENTRIES;
 
 #endif

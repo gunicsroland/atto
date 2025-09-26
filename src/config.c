@@ -80,3 +80,5 @@ struct editorSyntax HLDB[] = {
     {"cpp", CPP_HL_extensions, CPP_HL_keywords, "//", "/*", "*/",
      HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS}
 };
+
+size_t HLDB_ENTRIES = sizeof(HLDB) / sizeof(HLDB[0]);

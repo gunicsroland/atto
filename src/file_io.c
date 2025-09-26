@@ -10,6 +10,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+#include <ctype.h>
+#include <stdbool.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <time.h>
+#include <unistd.h>
+#include "config.h"
 
 char *editorRowsToString(int *buflen) {
   int totlen = 0;
@@ -45,7 +64,7 @@ void editorOpen(char *filename) {
 
   char *line = NULL;
   size_t linecap = 0;
-  size_t linelen;
+  ssize_t linelen;
   while ((linelen = getline(&line, &linecap, fp)) != -1) {
     while (linelen > 0 &&
            (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))

@@ -3,6 +3,6 @@
 
 char *editorRowsToString(int *buflen);
 void editorOpen(char *filename);
-int editorSave();
+void editorSave();
 
 #endif

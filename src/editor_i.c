@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 char *editorPrompt(char *prompt, void (*callback)(char *, int)) {
   size_t bufsize = 128;

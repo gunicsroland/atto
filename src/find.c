@@ -1,7 +1,9 @@
 #include "../include/data.h"
+#include "../include/config.h"
 #include "../include/find.h"
 #include "../include/row_operations.h"
 #include "../include/editor_i.h"
+
 
 
 #include <string.h>
