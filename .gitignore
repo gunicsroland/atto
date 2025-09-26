@@ -5,3 +5,5 @@
 *.exe
 atto
 kilo.c
+/misc/
+/backup/
