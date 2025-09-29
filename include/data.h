@@ -36,7 +36,7 @@ struct editorConfig
     struct termios orig_termios;
 };
 
-extern struct editorConfig E;
+extern struct editorConfig Editors[];
 
 /*** defines ***/
 
@@ -55,5 +55,6 @@ enum editorKey
     PAGE_UP,
     PAGE_DOWN
 };
+
 
 #endif

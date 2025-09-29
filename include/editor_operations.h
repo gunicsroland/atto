@@ -1,8 +1,10 @@
 #ifndef EDITOR_OPERATIONS_H
 #define EDITOR_OPERATIONS_H
 
-void editorInsertChar(int c);
-void editorDelChar();
-void editorInsertNewLine();
+#include "data.h"
+
+void editorInsertChar(struct editorConfig* editor, int c);
+void editorDelChar(struct editorConfig* editor);
+void editorInsertNewLine(struct editorConfig* editor);
 
 #endif

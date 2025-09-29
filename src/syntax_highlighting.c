@@ -1,52 +1,59 @@
 #include "../include/syntax_highlighting.h"
 #include "../include/config.h"
+#include "../include/terminal.h"
 
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-bool isHexaDigit(char c) { return ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'); }
+bool is_hexa_digit(char chr) { return ('a' <= chr && chr <= 'f') || ('A' <= chr && chr <= 'F'); }
 
-int is_separator(int c)
+int is_separator(int chr)
 {
-    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];:{}", c) != NULL;
+    return isspace(chr) || chr == '\0' || strchr(",.()+-/*=~%<>[];:{}", chr) != NULL;
 }
 
-void editorUpdateSyntax(erow* row)
+void editorUpdateSyntax(struct editorConfig* editor, erow* row)
 {
-    row->hl = realloc(row->hl, row->rsize);
+    unsigned char *new_hl = realloc(row->hl, row->rsize);
+    if (new_hl == NULL) {
+        die("realloc failed in editorUpdateSyntax");
+        return;
+    }
+    row->hl = new_hl;
     memset(row->hl, HL_NORMAL, row->rsize);
 
-    if (E.syntax == NULL)
+    if (editor->syntax == NULL){
         return;
+    }
 
-    const char** keywords = E.syntax->keywords;
+    const char** keywords = editor->syntax->keywords;
 
-    const char* scs = E.syntax->singleline_comment_start;
-    const char* mcs = E.syntax->multiline_comment_start;
-    const char* mce = E.syntax->multiline_comment_end;
+    const char* scs = editor->syntax->singleline_comment_start;
+    const char* mcs = editor->syntax->multiline_comment_start;
+    const char* mce = editor->syntax->multiline_comment_end;
 
-    int scs_len = scs ? strlen(scs) : 0;
-    int mcs_len = mcs ? strlen(mcs) : 0;
-    int mce_len = mce ? strlen(mce) : 0;
+    int scs_len = scs ? (int)strlen(scs) : 0;
+    int mcs_len = mcs ? (int)strlen(mcs) : 0;
+    int mce_len = mce ? (int)strlen(mce) : 0;
 
     int prev_sep = 1;
-    int in_string = 0;
-    int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
+    char in_string = 0;
+    int in_comment = (row->idx > 0 && editor->row[row->idx - 1].hl_open_comment);
 
-    int i = 0;
-    while (i < row->rsize)
+    int row_index = 0;
+    while (row_index < row->rsize)
     {
-        char c = row->render[i];
-        unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
-        char prev_c = (i > 0) ? row->render[i - 1] : '\0';
+        char current_char = row->render[row_index];
+        unsigned char prev_hl = (row_index > 0) ? row->hl[row_index - 1] : HL_NORMAL;
+        char prev_c = (row_index > 0) ? row->render[row_index - 1] : '\0';
 
         if (scs_len && !in_string && !in_comment)
         {
-            if (!strncmp(&row->render[i], scs, scs_len))
+            if (!strncmp(&row->render[row_index], scs, scs_len))
             {
-                memset(&row->hl[i], HL_COMMENT, row->rsize - i);
+                memset(&row->hl[row_index], HL_COMMENT, row->rsize - row_index);
                 break;
             }
         }
@@ -55,76 +62,75 @@ void editorUpdateSyntax(erow* row)
         {
             if (in_comment)
             {
-                row->hl[i] = HL_MLCOMMENT;
-                if (!strncmp(&row->render[i], mce, mce_len))
+                row->hl[row_index] = HL_MLCOMMENT;
+                if (!strncmp(&row->render[row_index], mce, mce_len))
                 {
-                    memset(&row->hl[i], HL_MLCOMMENT, mce_len);
-                    i += mce_len;
+                    memset(&row->hl[row_index], HL_MLCOMMENT, mce_len);
+                    row_index += mce_len;
                     in_comment = 0;
                     prev_sep = 1;
                 }
                 else
                 {
-                    i++;
+                    row_index++;
                     continue;
                 }
             }
-            else if (!strncmp(&row->render[i], mcs, mcs_len))
+            else if (!strncmp(&row->render[row_index], mcs, mcs_len))
             {
-                memset(&row->hl[i], HL_MLCOMMENT, mcs_len);
-                i += mcs_len;
+                memset(&row->hl[row_index], HL_MLCOMMENT, mcs_len);
+                row_index += mcs_len;
                 in_comment = 1;
                 continue;
             }
         }
 
-        if (E.syntax->flags & HL_HIGHLIGHT_STRINGS)
+        if (editor->syntax->flags & HL_HIGHLIGHT_STRINGS)
         {
             if (in_string)
             {
-                row->hl[i] = HL_STRING;
-                if (c == '\\' && i + 1 < row->rsize)
+                row->hl[row_index] = HL_STRING;
+                if (current_char == '\\' && row_index + 1 < row->rsize)
                 {
-                    row->hl[i + 1] = HL_STRING;
-                    i += 2;
+                    row->hl[row_index + 1] = HL_STRING;
+                    row_index += 2;
                     continue;
                 }
-                if (c == in_string)
+                if (current_char == in_string) {
                     in_string = 0;
-                i++;
+                }
+                row_index++;
                 prev_sep = 1;
                 continue;
             }
-            else
+            
+            if (current_char == '"' || current_char == '\'')
             {
-                if (c == '"' || c == '\'')
-                {
-                    in_string = c;
-                    row->hl[i] = HL_STRING;
-                    i++;
-                    continue;
-                }
+                in_string = current_char;
+                row->hl[row_index] = HL_STRING;
+                row_index++;
+                continue;
             }
         }
 
-        if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS)
+        if (editor->syntax->flags & HL_HIGHLIGHT_NUMBERS)
         {
-            if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
-                (c == '.' && prev_hl == HL_NUMBER) ||
-                (c == 'x' && prev_hl == HL_NUMBER && prev_c == '0') ||
-                (c == 'b' && prev_hl == HL_NUMBER && prev_c == '0') ||
-                (isHexaDigit(c) && prev_hl == HL_NUMBER))
+            if ((isdigit(current_char) && (prev_sep || prev_hl == HL_NUMBER)) ||
+                (current_char == '.' && prev_hl == HL_NUMBER) ||
+                (current_char == 'x' && prev_hl == HL_NUMBER && prev_c == '0') ||
+                (current_char == 'b' && prev_hl == HL_NUMBER && prev_c == '0') ||
+                (is_hexa_digit(current_char) && prev_hl == HL_NUMBER))
             {
-                row->hl[i] = HL_NUMBER;
-                i++;
+                row->hl[row_index] = HL_NUMBER;
+                row_index++;
                 prev_sep = 0;
                 continue;
             }
-            if ((isdigit(c) && prev_c == 'o'))
+            if ((isdigit(current_char) && prev_c == 'o'))
             {
-                row->hl[i - 1] = HL_NUMBER;
-                row->hl[i] = HL_NUMBER;
-                i++;
+                row->hl[row_index - 1] = HL_NUMBER;
+                row->hl[row_index] = HL_NUMBER;
+                row_index++;
                 prev_sep = 0;
                 continue;
             }
@@ -132,67 +138,70 @@ void editorUpdateSyntax(erow* row)
 
         if (prev_sep)
         {
-            int j;
-            for (j = 0; keywords[j]; j++)
+            int keywords_index = 0;
+            for (keywords_index = 0; keywords[keywords_index]; keywords_index++)
             {
-                int klen = strlen(keywords[j]);
-                int kw2 = keywords[j][klen - 1] == '|';
-                if (kw2)
+                size_t klen = strlen(keywords[keywords_index]);
+                int kw2 = keywords[keywords_index][klen - 1] == '|';
+                if (kw2){
                     klen--;
+                }
 
-                if (!strncmp(&row->render[i], keywords[j], klen) &&
-                    is_separator(row->render[i + klen]))
+                if (!strncmp(&row->render[row_index], keywords[keywords_index], klen) &&
+                    is_separator(row->render[row_index + klen]))
                 {
-                    memset(&row->hl[i], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
-                    i += klen;
+                    memset(&row->hl[row_index], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
+                    row_index += (int)klen;
                     break;
                 }
             }
-            if (keywords[j] != NULL)
+            if (keywords[keywords_index] != NULL)
             {
                 prev_sep = 0;
                 continue;
             }
         }
 
-        prev_sep = is_separator(c);
-        i++;
+        prev_sep = is_separator(current_char);
+        row_index++;
     }
 
     int changed = (row->hl_open_comment != in_comment);
     row->hl_open_comment = in_comment;
-    if (changed && row->idx + 1 < E.numrows)
-        editorUpdateSyntax(&E.row[row->idx + 1]);
+    if (changed && row->idx + 1 < editor->numrows){
+        editorUpdateSyntax(editor, &editor->row[row->idx + 1]);
+    }
 }
 
-void editorSelectSyntaxHighlight()
+void editorSelectSyntaxHighlight(struct editorConfig* editor)
 {
-    E.syntax = NULL;
-    if (E.filename == NULL)
+    editor->syntax = NULL;
+    if (editor->filename == NULL) {
         return;
+    }
 
-    char* ext = strrchr(E.filename, '.');
+    char* ext = strrchr(editor->filename, '.');
 
-    for (unsigned int j = 0; j < HLDB_ENTRIES; j++)
+    for (unsigned int syntax_index = 0; syntax_index < hldb_entries; syntax_index++)
     {
-        struct editorSyntax* s = &HLDB[j];
-        unsigned int i = 0;
-        while (s->filematch[i])
+        struct editorSyntax* syntax_p = &hldb[syntax_index];
+        unsigned int language_type_index = 0;
+        while (syntax_p->filematch[language_type_index])
         {
-            int is_ext = (s->filematch[i][0] == '.');
-            if ((is_ext && ext && !strcmp(ext, s->filematch[i])) ||
-                (!is_ext && strstr(E.filename, s->filematch[i])))
+            int is_ext = (syntax_p->filematch[language_type_index][0] == '.');
+            if ((is_ext && ext && !strcmp(ext, syntax_p->filematch[language_type_index])) ||
+                (!is_ext && strstr(editor->filename, syntax_p->filematch[language_type_index])))
             {
-                E.syntax = s;
+                editor->syntax = syntax_p;
                 return;
 
-                int filerow;
-                for (filerow = 0; filerow < E.numrows; filerow++)
+                int filerow = 0;
+                for (filerow = 0; filerow < editor->numrows; filerow++)
                 {
-                    editorUpdateSyntax(&E.row[filerow]);
+                    editorUpdateSyntax(editor, &editor->row[filerow]);
                 }
             }
-            i++;
+            language_type_index++;
         }
     }
 }

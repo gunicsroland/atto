@@ -66,47 +66,47 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int))
     }
 }
 
-void editorMoveCursor(int key)
+void editorMoveCursor(struct editorConfig* editor, int key)
 {
-    erow* row = (E.cy < E.numrows) ? &E.row[E.cy] : NULL;
+    erow* row = (editor->cy < editor->numrows) ? &editor->row[editor->cy] : NULL;
 
     switch (key)
     {
     case ARROW_LEFT:
-        if (E.cx != 0)
-            E.cx--;
-        else if (E.cy > 0)
+        if (editor->cx != 0)
+            editor->cx--;
+        else if (editor->cy > 0)
         {
-            E.cy--;
-            E.cx = E.row[E.cy].size;
+            editor->cy--;
+            editor->cx = editor->row[editor->cy].size;
         }
         break;
     case ARROW_RIGHT:
-        if (row && E.cx < row->size)
-            E.cx++;
-        else if (row && E.cx == row->size)
+        if (row && editor->cx < row->size)
+            editor->cx++;
+        else if (row && editor->cx == row->size)
         {
-            E.cy++;
-            E.cx = 0;
+            editor->cy++;
+            editor->cx = 0;
         }
         break;
     case ARROW_UP:
-        if (E.cy != 0)
-            E.cy--;
+        if (editor->cy != 0)
+            editor->cy--;
         break;
     case ARROW_DOWN:
-        if (E.cy < E.numrows)
-            E.cy++;
+        if (editor->cy < editor->numrows)
+            editor->cy++;
         break;
     }
 
-    row = (E.cy < E.numrows) ? &E.row[E.cy] : NULL;
+    row = (editor->cy < editor->numrows) ? &editor->row[editor->cy] : NULL;
     int rowlen = row ? row->size : 0;
-    if (E.cx > rowlen)
-        E.cx = rowlen;
+    if (editor->cx > rowlen)
+        editor->cx = rowlen;
 }
 
-void editorProcessKeypress()
+void editorProcessKeypress(struct editorConfig* editor)
 {
     static int quit_times = ATTO_QUIT_TIMES;
     int c = editorReadKey();
@@ -114,11 +114,11 @@ void editorProcessKeypress()
     {
 
     case '\r':
-        editorInsertNewLine();
+        editorInsertNewLine(editor);
         break;
 
     case CTRL_KEY('q'):
-        if (E.dirty && quit_times > 0)
+        if (editor->dirty && quit_times > 0)
         {
             editorSetStatusMessage("Warning! File ha unsaved changes. "
                                    "Press ^Q %d more times to quit.",
@@ -127,13 +127,13 @@ void editorProcessKeypress()
             return;
         }
 
-        if (E.row)
-            editorFreeRow(E.row);
+        if (editor->row)
+            editorFreeRow(editor->row);
 
-        if (E.filename)
+        if (editor->filename)
         {
-            free(E.filename);
-            E.filename = NULL;
+            free(editor->filename);
+            editor->filename = NULL;
         }
 
         write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -142,26 +142,26 @@ void editorProcessKeypress()
         break;
 
     case CTRL_KEY('s'):
-        editorSave();
+        editorSave(editor);
         break;
 
     case HOME_KEY:
-        E.cx = 0;
+        editor->cx = 0;
         break;
     case END_KEY:
-        if (E.cy < E.numrows)
-            E.cx = E.row[E.cy].size;
+        if (editor->cy < editor->numrows)
+            editor->cx = editor->row[editor->cy].size;
         break;
     case CTRL_KEY('f'):
-        editorFind();
+        editorFind(editor);
         break;
 
     case BACKSPACE:
     case CTRL_KEY('h'):
     case DEL_KEY:
         if (c == DEL_KEY)
-            editorMoveCursor(ARROW_RIGHT);
-        editorDelChar();
+            editorMoveCursor(editor, ARROW_RIGHT);
+        editorDelChar(editor);
         break;
 
     case PAGE_UP:
@@ -169,18 +169,18 @@ void editorProcessKeypress()
     {
         if (c == PAGE_UP)
         {
-            E.cy = E.rowoff;
+            editor->cy = editor->rowoff;
         }
         else if (c == PAGE_DOWN)
         {
-            E.cy = E.rowoff + E.screenrows - 1;
-            if (E.cy > E.numrows)
-                E.cy = E.numrows;
+            editor->cy = editor->rowoff + editor->screenrows - 1;
+            if (editor->cy > editor->numrows)
+                editor->cy = editor->numrows;
         }
 
-        int times = E.screenrows;
+        int times = editor->screenrows;
         while (times--)
-            editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+            editorMoveCursor(editor, c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
     }
     break;
 
@@ -188,16 +188,16 @@ void editorProcessKeypress()
     case ARROW_DOWN:
     case ARROW_LEFT:
     case ARROW_RIGHT:
-        editorMoveCursor(c);
+        editorMoveCursor(editor, c);
         break;
 
     case CTRL_KEY('l'):
-        editorFindLine();
+        editorFindLine(editor);
     case '\x1b':
         break;
 
     default:
-        editorInsertChar(c);
+        editorInsertChar(editor, c);
         break;
     }
 

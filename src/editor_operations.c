@@ -2,68 +2,68 @@
 #include "../include/data.h"
 #include "../include/row_operations.h"
 
-void editorInsertChar(int c)
+void editorInsertChar(struct editorConfig* editor, int c)
 {
-    if (E.cy == E.numrows)
+    if (editor->cy == editor->numrows)
     {
-        editorInsertRow(E.numrows, "", 0);
+        editorInsertRow(editor, editor->numrows, "", 0);
     }
-    editorRowInsertChar(&E.row[E.cy], E.cx, c);
-    E.cx++;
+    editorRowInsertChar(editor, &editor->row[editor->cy], editor->cx, c);
+    editor->cx++;
 }
 
-void editorDelChar()
+void editorDelChar(struct editorConfig* editor)
 {
-    if (E.cy == E.numrows)
+    if (editor->cy == editor->numrows)
         return;
-    if (E.cx == 0 && E.cy == 0)
+    if (editor->cx == 0 && editor->cy == 0)
         return;
 
-    erow* row = &E.row[E.cy];
-    if (E.cx > 0)
+    erow* row = &editor->row[editor->cy];
+    if (editor->cx > 0)
     {
-        editorRowDelChar(row, E.cx - 1);
-        E.cx--;
+        editorRowDelChar(editor, row, editor->cx - 1);
+        editor->cx--;
     }
     else
     {
-        E.cx = E.row[E.cy - 1].size;
-        editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
-        editorDelRow(E.cy);
-        E.cy--;
+        editor->cx = editor->row[editor->cy - 1].size;
+        editorRowAppendString(editor, &editor->row[editor->cy - 1], row->chars, row->size);
+        editorDelRow(editor, editor->cy);
+        editor->cy--;
     }
 }
 
-void editorInsertNewLine()
+void editorInsertNewLine(struct editorConfig* editor)
 {
-    if (E.cx == 0)
+    if (editor->cx == 0)
     {
-        editorInsertRow(E.cy, "", 0);
+        editorInsertRow(editor, editor->cy, "", 0);
     }
     else
     {
-        erow* row = &E.row[E.cy];
-        editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
-        row = &E.row[E.cy];
-        row->size = E.cx;
+        erow* row = &editor->row[editor->cy];
+        editorInsertRow(editor, editor->cy + 1, &row->chars[editor->cx], row->size - editor->cx);
+        row = &editor->row[editor->cy];
+        row->size = editor->cx;
         row->chars[row->size] = '\0';
         editorUpdateRow(row);
     }
 
     int tabs = 0;
-    if (E.cy >= 0)
+    if (editor->cy >= 0)
     {
         tabs = 0;
-        for (int j = 0; j < E.row[E.cy].size; j++)
-            if (E.row[E.cy].chars[j] == '\t')
+        for (int j = 0; j < editor->row[editor->cy].size; j++)
+            if (editor->row[editor->cy].chars[j] == '\t')
                 tabs++;
 
         for (int j = 0; j < tabs; j++)
         {
-            editorRowInsertChar(&E.row[E.cy + 1], 0, '\t');
+            editorRowInsertChar(editor, &editor->row[editor->cy + 1], 0, '\t');
         }
     }
 
-    E.cy++;
-    E.cx = tabs;
+    editor->cy++;
+    editor->cx = tabs;
 }

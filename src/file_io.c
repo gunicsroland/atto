@@ -20,21 +20,21 @@
 #include "../include/syntax_highlighting.h"
 #include "../include/terminal.h"
 
-char* editorRowsToString(int* buflen)
+char* editorRowsToString(struct editorConfig* editor, int* buflen)
 {
     int totlen = 0;
     int j;
 
-    for (j = 0; j < E.numrows; j++)
-        totlen += E.row[j].size + 1;
+    for (j = 0; j < editor->numrows; j++)
+        totlen += editor->row[j].size + 1;
     *buflen = totlen;
 
     char* buf = malloc(totlen);
     char* p = buf;
-    for (j = 0; j < E.numrows; j++)
+    for (j = 0; j < editor->numrows; j++)
     {
-        memcpy(p, E.row[j].chars, E.row[j].size);
-        p += E.row[j].size;
+        memcpy(p, editor->row[j].chars, editor->row[j].size);
+        p += editor->row[j].size;
         *p = '\n';
         p++;
     }
@@ -42,51 +42,51 @@ char* editorRowsToString(int* buflen)
     return buf;
 }
 
-void editorOpen(char* filename)
+void editorOpen(struct editorConfig* editor, char* filename)
 {
-    free(E.filename);
-    E.filename = strdup(filename);
+    free(editor->filename);
+    editor->filename = strdup(filename);
 
-    FILE* fp = fopen(filename, "r");
-    if (!fp)
-        fp = fopen(filename, "a");
-    if (!fp)
+    FILE* filep = fopen(filename, "r");
+    if (!filep)
+        filep = fopen(filename, "a");
+    if (!filep)
         die("fopen");
 
-    editorSelectSyntaxHighlight();
+    editorSelectSyntaxHighlight(editor);
 
     char* line = NULL;
     size_t linecap = 0;
     ssize_t linelen;
-    while ((linelen = getline(&line, &linecap, fp)) != -1)
+    while ((linelen = getline(&line, &linecap, filep)) != -1)
     {
         while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
-        editorInsertRow(E.numrows, line, linelen);
+        editorInsertRow(editor, editor->numrows, line, linelen);
     }
     free(line);
-    fclose(fp);
-    E.num_width = editorGetNumLen(E.numrows - 1);
-    E.dirty = 0;
+    fclose(filep);
+    editor->num_width = editorGetNumLen(editor->numrows - 1);
+    editor->dirty = 0;
 }
 
-void editorSave()
+void editorSave(struct editorConfig* editor)
 {
-    if (E.filename == NULL)
+    if (editor->filename == NULL)
     {
-        E.filename = editorPrompt("Save as: %s", NULL);
-        if (E.filename == NULL)
+        editor->filename = editorPrompt("Save as: %s", NULL);
+        if (editor->filename == NULL)
         {
-            editorSetStatusMessage("Save aborted");
+            editorSetStatusMessage(editor, "Save aborted");
             return;
         }
-        editorSelectSyntaxHighlight();
+        editorSelectSyntaxHighlight(editor);
     }
 
     int len;
-    char* buf = editorRowsToString(&len);
+    char* buf = editorRowsToString(editor, &len);
 
-    int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+    int fd = open(editor->filename, O_RDWR | O_CREAT, 0644);
     if (fd != -1)
     {
         if (ftruncate(fd, len) != -1)
@@ -95,8 +95,8 @@ void editorSave()
             {
                 close(fd);
                 free(buf);
-                E.dirty = 0;
-                editorSetStatusMessage("%d bytes written to disk", len);
+                editor->dirty = 0;
+                editorSetStatusMessage(editor,"%d bytes written to disk", len);
                 return;
             }
         }
@@ -104,5 +104,5 @@ void editorSave()
     }
 
     free(buf);
-    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
+    editorSetStatusMessage(editor, "Can't save! I/O error: %s", strerror(errno));
 }

@@ -1,8 +1,10 @@
 #ifndef FILE_IO_H
 #define FILE_IO_H
 
-char* editorRowsToString(int* buflen);
-void editorOpen(char* filename);
-void editorSave();
+#include "data.h"
+
+char* editorRowsToString(struct editorConfig* editor, int* buflen);
+void editorOpen(struct editorConfig* editor, char* filename);
+void editorSave(struct editorConfig* editor);
 
 #endif

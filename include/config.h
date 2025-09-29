@@ -8,6 +8,7 @@
 #define ATTO_VERSION "0.2.4"
 #define ATTO_TAB_STOP 8
 #define ATTO_QUIT_TIMES 2
+#define ATTO_MAX_BUFFERS 2
 
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
 #define HL_HIGHLIGHT_STRINGS (1 << 1)
@@ -40,13 +41,13 @@ struct editorSyntax
 
 /*** filetypes ***/
 
-extern const char* C_HL_extensions[];
-extern const char* C_HL_keywords[];
-extern const char* CPP_HL_extensions[];
-extern const char* CPP_HL_keywords[];
+extern const char* const c_hl_extensions[];
+extern const char* const c_hl_keywords[];
+extern const char* const cpp_hl_extensions[];
+extern const char* const cpp_hl_keywords[];
 
-extern struct editorSyntax HLDB[];
+extern struct editorSyntax hldb[];
 
-extern size_t HLDB_ENTRIES;
+extern size_t hldb_entries;
 
 #endif

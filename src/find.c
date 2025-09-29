@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void editorFindCallback(char* query, int key)
+void editorFindCallback(struct editorConfig* editor, char* query, int key)
 {
     static int last_match = -1;
     static int direction = 1;
@@ -18,7 +18,7 @@ void editorFindCallback(char* query, int key)
 
     if (saved_hl)
     {
-        memcpy(E.row[saved_hl_line].hl, saved_hl, E.row[saved_hl_line].rsize);
+        memcpy(editor->row[saved_hl_line].hl, saved_hl, editor->row[saved_hl_line].rsize);
         free(saved_hl);
         saved_hl = NULL;
     }
@@ -47,22 +47,22 @@ void editorFindCallback(char* query, int key)
         direction = 1;
     int current = last_match;
     int i;
-    for (i = 0; i < E.numrows; i++)
+    for (i = 0; i < editor->numrows; i++)
     {
         current += direction;
         if (current == -1)
-            current = E.numrows - 1;
-        else if (current == E.numrows)
+            current = editor->numrows - 1;
+        else if (current == editor->numrows)
             current = 0;
 
-        erow* row = &E.row[current];
+        erow* row = &editor->row[current];
         char* match = strstr(row->render, query);
         if (match)
         {
             last_match = current;
-            E.cy = current;
-            E.cx = editorRowRxToCx(row, match - row->render);
-            E.rowoff = E.numrows;
+            editor->cy = current;
+            editor->cx = editorRowRxToCx(row, match - row->render);
+            editor->rowoff = editor->numrows;
 
             saved_hl_line = current;
             saved_hl = malloc(row->rsize);
@@ -73,29 +73,29 @@ void editorFindCallback(char* query, int key)
     }
 }
 
-void editorFind()
+void editorFind(struct editorConfig* editor)
 {
-    int saved_cx = E.cx;
-    int saved_cy = E.cy;
-    int saved_coloff = E.coloff;
-    int saved_rowoff = E.rowoff;
+    int saved_cx = editor->cx;
+    int saved_cy = editor->cy;
+    int saved_coloff = editor->coloff;
+    int saved_rowoff = editor->rowoff;
 
     char* query = editorPrompt("Search: %s (Use Esc/Enter/Arrows)", editorFindCallback);
     if (query)
         free(query);
     else
     {
-        E.cx = saved_cx;
-        E.cy = saved_cy;
-        E.coloff = saved_coloff;
-        E.rowoff = saved_rowoff;
+        editor->cx = saved_cx;
+        editor->cy = saved_cy;
+        editor->coloff = saved_coloff;
+        editor->rowoff = saved_rowoff;
     }
 }
 
-void editorFindLine()
+void editorFindLine(struct editorConfig* editor)
 {
     char* query = editorPrompt("Search Line Number: %s (Use Esc/Enter)", NULL);
-    if (query == NULL || E.numrows == 0)
+    if (query == NULL || editor->numrows == 0)
         return;
 
     int num;
@@ -103,12 +103,12 @@ void editorFindLine()
         return;
     if (num <= 0)
         return;
-    if (num > E.numrows)
-        num = E.numrows;
+    if (num > editor->numrows)
+        num = editor->numrows;
 
-    E.cy = num - 1;
-    E.cx = 0;
-    E.rowoff = E.numrows;
+    editor->cy = num - 1;
+    editor->cx = 0;
+    editor->rowoff = editor->numrows;
 
     free(query);
 }

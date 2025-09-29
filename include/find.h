@@ -1,8 +1,10 @@
 #ifndef FIND_H
 #define FIND_H
 
-void editorFindCallback(char* query, int key);
-void editorFind();
-void editorFindLine();
+#include "data.h"
+
+void editorFindCallback(struct editorConfig* editor, char* query, int key);
+void editorFind(struct editorConfig* editor);
+void editorFindLine(struct editorConfig* editor);
 
 #endif
