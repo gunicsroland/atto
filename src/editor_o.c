@@ -47,6 +47,10 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
     for (y = 0; y < editor->screenrows; y++)
     {
         filerow = y + editor->rowoff;
+        char buf[32];
+        snprintf(buf, sizeof(buf), "\x1b[%d;%dH", y + 1, editor->start_x + 1);
+        abAppend(ab, buf, strlen(buf));
+
         if (filerow >= editor->numrows)
         {
             if (editor->numrows == 0 && y == editor->screenrows / 3)
@@ -54,10 +58,10 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
                 char welcome[80];
                 int welcomelen =
                     snprintf(welcome, sizeof(welcome), "Atto editor -- version %s", ATTO_VERSION);
-                if (welcomelen > editor->screencols)
-                    welcomelen = editor->screencols;
+                if (welcomelen > editor->width)
+                    welcomelen = editor->width;
 
-                padding = (editor->screencols - welcomelen) / 2;
+                padding = (editor->width - welcomelen) / 2;
                 if (padding)
                 {
                     abAppend(ab, "~", 1);
@@ -77,8 +81,8 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
             int len = editor->row[filerow].rsize - editor->coloff;
             if (len < 0)
                 len = 0;
-            if (len > editor->screencols)
-                len = editor->screencols;
+            if (len > editor->width)
+                len = editor->width;
             char* c = &editor->row[filerow].render[editor->coloff];
             unsigned char* hl = &editor->row[filerow].hl[editor->coloff];
             int current_color = -1;

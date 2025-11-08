@@ -44,6 +44,8 @@ char* editorRowsToString(struct editorConfig* editor, int* buflen)
 
 void editorOpen(struct editorConfig* editor, char* filename)
 {
+    printf("editor->filename before free = %p\n", (void*)editor->filename);
+
     free(editor->filename);
     editor->filename = strdup(filename);
 
@@ -74,7 +76,7 @@ void editorSave(struct editorConfig* editor)
 {
     if (editor->filename == NULL)
     {
-        editor->filename = editorPrompt("Save as: %s", NULL);
+        editor->filename = editorPrompt(editor, "Save as: %s", NULL);
         if (editor->filename == NULL)
         {
             editorSetStatusMessage(editor, "Save aborted");

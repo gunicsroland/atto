@@ -47,7 +47,7 @@ void editorInsertNewLine(struct editorConfig* editor)
         row = &editor->row[editor->cy];
         row->size = editor->cx;
         row->chars[row->size] = '\0';
-        editorUpdateRow(row);
+        editorUpdateRow(editor, row);
     }
 
     int tabs = 0;

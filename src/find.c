@@ -80,7 +80,8 @@ void editorFind(struct editorConfig* editor)
     int saved_coloff = editor->coloff;
     int saved_rowoff = editor->rowoff;
 
-    char* query = editorPrompt("Search: %s (Use Esc/Enter/Arrows)", editorFindCallback);
+    printf("Initiating find\n");
+    char* query = editorPrompt(editor, "Search: %s (Use Esc/Enter/Arrows)", editorFindCallback);
     if (query)
         free(query);
     else
@@ -94,7 +95,7 @@ void editorFind(struct editorConfig* editor)
 
 void editorFindLine(struct editorConfig* editor)
 {
-    char* query = editorPrompt("Search Line Number: %s (Use Esc/Enter)", NULL);
+    char* query = editorPrompt(editor, "Search Line Number: %s (Use Esc/Enter)", NULL);
     if (query == NULL || editor->numrows == 0)
         return;
 

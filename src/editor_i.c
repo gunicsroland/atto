@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-char* editorPrompt(char* prompt, void (*callback)(char*, int))
+char* editorPrompt(struct editorConfig* editor, char* prompt, void (*callback)(struct editorConfig*,char*, int))
 {
     size_t bufsize = 128;
     char* buf = malloc(bufsize);
@@ -23,8 +23,8 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int))
 
     while (1)
     {
-        editorSetStatusMessage(prompt, buf);
-        editorRefreshScreen();
+        editorSetStatusMessage(editor, prompt, buf);
+        editorRefreshScreen(editor);
 
         int c = editorReadKey();
         if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE)
@@ -34,9 +34,9 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int))
         }
         else if (c == '\x1b')
         {
-            editorSetStatusMessage("");
+            editorSetStatusMessage(editor, "");
             if (callback)
-                callback(buf, c);
+                callback(editor, buf, c);
             free(buf);
             return NULL;
         }
@@ -44,9 +44,9 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int))
         {
             if (buflen != 0)
             {
-                editorSetStatusMessage("");
+                editorSetStatusMessage(editor, "");
                 if (callback)
-                    callback(buf, c);
+                    callback(editor, buf, c);
                 return buf;
             }
         }
@@ -62,7 +62,7 @@ char* editorPrompt(char* prompt, void (*callback)(char*, int))
         }
 
         if (callback)
-            callback(buf, c);
+            callback(editor, buf, c);
     }
 }
 
@@ -120,7 +120,7 @@ void editorProcessKeypress(struct editorConfig* editor)
     case CTRL_KEY('q'):
         if (editor->dirty && quit_times > 0)
         {
-            editorSetStatusMessage("Warning! File ha unsaved changes. "
+            editorSetStatusMessage(editor, "Warning! File ha unsaved changes. "
                                    "Press ^Q %d more times to quit.",
                                    quit_times);
             quit_times--;
@@ -195,7 +195,21 @@ void editorProcessKeypress(struct editorConfig* editor)
         editorFindLine(editor);
     case '\x1b':
         break;
+        
+    case CTRL_KEY('j'):
+        if(current_editor > 0){
+            current_editor--;
+        }
+        editorSetStatusMessage(&Editors[current_editor], "Switched to editor %d", current_editor + 1);
+        break;
 
+    case CTRL_KEY('k'):
+        if(current_editor < editor_num - 1){
+            current_editor++;
+        }
+        editorSetStatusMessage(&Editors[current_editor], "Switched to editor %d", current_editor + 1);
+        break;
+        
     default:
         editorInsertChar(editor, c);
         break;

@@ -82,7 +82,6 @@ void editorUpdateRow(struct editorConfig* editor, erow* row)
 
 void editorInsertRow(struct editorConfig* editor, int at, char* s, size_t len)
 {
-    printf("Inserting row at %d: %.*s\n", at, (int)len, s);
     if (at < 0 || editor->numrows < at)
         return;
 

@@ -29,6 +29,8 @@ struct editorConfig
     erow* row;
     int num_width;
     int dirty;
+    int start_x;
+    int width;
     char* filename;
     char statusmsg[80];
     time_t statusmsg_time;
@@ -37,6 +39,8 @@ struct editorConfig
 };
 
 extern struct editorConfig Editors[];
+extern int editor_num;
+extern int current_editor;
 
 /*** defines ***/
 
