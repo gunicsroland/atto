@@ -90,8 +90,8 @@ void editorDrawRows(struct editorConfig* editor,
                 editor->row[filerow].rsize - editor->coloff;
             if (len < 0)
                 len = 0;
-            if (len > editor->width)
-                len = editor->width;
+            if (len > editor->screencols)
+                len = editor->screencols;
             char* c = &editor->row[filerow]
                            .render[editor->coloff];
             unsigned char* hl =
