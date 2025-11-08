@@ -3,7 +3,8 @@
 
 #include "data.h"
 
-void editorFindCallback(struct editorConfig* editor, char* query, int key);
+void editorFindCallback(struct editorConfig* editor,
+                        char* query, int key);
 void editorFind(struct editorConfig* editor);
 void editorFindLine(struct editorConfig* editor);
 

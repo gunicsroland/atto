@@ -60,5 +60,4 @@ enum editorKey
     PAGE_DOWN
 };
 
-
 #endif

@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void editorFindCallback(struct editorConfig* editor, char* query, int key)
+void editorFindCallback(struct editorConfig* editor,
+                        char* query, int key)
 {
     static int last_match = -1;
     static int direction = 1;
@@ -18,7 +19,8 @@ void editorFindCallback(struct editorConfig* editor, char* query, int key)
 
     if (saved_hl)
     {
-        memcpy(editor->row[saved_hl_line].hl, saved_hl, editor->row[saved_hl_line].rsize);
+        memcpy(editor->row[saved_hl_line].hl, saved_hl,
+               editor->row[saved_hl_line].rsize);
         free(saved_hl);
         saved_hl = NULL;
     }
@@ -61,13 +63,15 @@ void editorFindCallback(struct editorConfig* editor, char* query, int key)
         {
             last_match = current;
             editor->cy = current;
-            editor->cx = editorRowRxToCx(row, match - row->render);
+            editor->cx =
+                editorRowRxToCx(row, match - row->render);
             editor->rowoff = editor->numrows;
 
             saved_hl_line = current;
             saved_hl = malloc(row->rsize);
             memcpy(saved_hl, row->hl, row->rsize);
-            memset(&row->hl[match - row->render], HL_MATCH, strlen(query));
+            memset(&row->hl[match - row->render], HL_MATCH,
+                   strlen(query));
             break;
         }
     }
@@ -81,7 +85,9 @@ void editorFind(struct editorConfig* editor)
     int saved_rowoff = editor->rowoff;
 
     printf("Initiating find\n");
-    char* query = editorPrompt(editor, "Search: %s (Use Esc/Enter/Arrows)", editorFindCallback);
+    char* query = editorPrompt(
+        editor, "Search: %s (Use Esc/Enter/Arrows)",
+        editorFindCallback);
     if (query)
         free(query);
     else
@@ -95,7 +101,9 @@ void editorFind(struct editorConfig* editor)
 
 void editorFindLine(struct editorConfig* editor)
 {
-    char* query = editorPrompt(editor, "Search Line Number: %s (Use Esc/Enter)", NULL);
+    char* query = editorPrompt(
+        editor, "Search Line Number: %s (Use Esc/Enter)",
+        NULL);
     if (query == NULL || editor->numrows == 0)
         return;
 

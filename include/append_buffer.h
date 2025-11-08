@@ -7,9 +7,9 @@ struct abuf
     int len;
 };
 
-#define ABUF_INIT                                                                                  \
-    {                                                                                              \
-        NULL, 0                                                                                    \
+#define ABUF_INIT                                          \
+    {                                                      \
+        NULL, 0                                            \
     }
 
 void abAppend(struct abuf* ab, const char* s, int len);

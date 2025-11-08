@@ -18,7 +18,8 @@ void editorScroll(struct editorConfig* editor)
     editor->rx = 0;
     if (editor->cy < editor->numrows)
     {
-        editor->rx = editorRowCxToRx(&editor->row[editor->cy], editor->cx);
+        editor->rx = editorRowCxToRx(
+            &editor->row[editor->cy], editor->cx);
     }
 
     if (editor->cy < editor->rowoff)
@@ -27,7 +28,8 @@ void editorScroll(struct editorConfig* editor)
     }
     if (editor->cy >= editor->rowoff + editor->screenrows)
     {
-        editor->rowoff = editor->cy - editor->screenrows + 1;
+        editor->rowoff =
+            editor->cy - editor->screenrows + 1;
     }
     if (editor->rx < editor->coloff)
     {
@@ -35,11 +37,13 @@ void editorScroll(struct editorConfig* editor)
     }
     if (editor->rx >= editor->coloff + editor->screencols)
     {
-        editor->coloff = editor->rx - editor->screencols + 1;
+        editor->coloff =
+            editor->rx - editor->screencols + 1;
     }
 }
 
-void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
+void editorDrawRows(struct editorConfig* editor,
+                    struct abuf* ab)
 {
     int y;
     int filerow;
@@ -48,16 +52,20 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
     {
         filerow = y + editor->rowoff;
         char buf[32];
-        snprintf(buf, sizeof(buf), "\x1b[%d;%dH", y + 1, editor->start_x + 1);
+        snprintf(buf, sizeof(buf), "\x1b[%d;%dH", y + 1,
+                 editor->start_x + 1);
         abAppend(ab, buf, strlen(buf));
 
         if (filerow >= editor->numrows)
         {
-            if (editor->numrows == 0 && y == editor->screenrows / 3)
+            if (editor->numrows == 0 &&
+                y == editor->screenrows / 3)
             {
                 char welcome[80];
                 int welcomelen =
-                    snprintf(welcome, sizeof(welcome), "Atto editor -- version %s", ATTO_VERSION);
+                    snprintf(welcome, sizeof(welcome),
+                             "Atto editor -- version %s",
+                             ATTO_VERSION);
                 if (welcomelen > editor->width)
                     welcomelen = editor->width;
 
@@ -78,19 +86,23 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
         }
         else
         {
-            int len = editor->row[filerow].rsize - editor->coloff;
+            int len =
+                editor->row[filerow].rsize - editor->coloff;
             if (len < 0)
                 len = 0;
             if (len > editor->width)
                 len = editor->width;
-            char* c = &editor->row[filerow].render[editor->coloff];
-            unsigned char* hl = &editor->row[filerow].hl[editor->coloff];
+            char* c = &editor->row[filerow]
+                           .render[editor->coloff];
+            unsigned char* hl =
+                &editor->row[filerow].hl[editor->coloff];
             int current_color = -1;
             int j;
 
             char line_num_buf[50];
-            int line_num_len =
-                snprintf(line_num_buf, sizeof(line_num_buf), "%*d ", editor->num_width, filerow + 1);
+            int line_num_len = snprintf(
+                line_num_buf, sizeof(line_num_buf), "%*d ",
+                editor->num_width, filerow + 1);
             abAppend(ab, "\x1b[90m", 5);
             abAppend(ab, line_num_buf, line_num_len);
             abAppend(ab, "\x1b[39m", 5);
@@ -99,14 +111,17 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
             {
                 if (iscntrl(c[j]))
                 {
-                    char sym = (c[j] <= 26) ? '@' + c[j] : '?';
+                    char sym =
+                        (c[j] <= 26) ? '@' + c[j] : '?';
                     abAppend(ab, "\x1b[7m", 4);
                     abAppend(ab, &sym, 1);
                     abAppend(ab, "\x1b[m", 3);
                     if (current_color != -1)
                     {
                         char buf[16];
-                        int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", current_color);
+                        int clen = snprintf(
+                            buf, sizeof(buf),
+                            "\x1b[38;5;%dm", current_color);
                         abAppend(ab, buf, clen);
                     }
                 }
@@ -126,7 +141,9 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
                     {
                         current_color = color;
                         char buf[16];
-                        int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", color);
+                        int clen = snprintf(
+                            buf, sizeof(buf),
+                            "\x1b[38;5;%dm", color);
                         abAppend(ab, buf, clen);
                     }
                     abAppend(ab, &c[j], 1);
@@ -140,17 +157,21 @@ void editorDrawRows(struct editorConfig* editor, struct abuf* ab)
     }
 }
 
-void editorDrawStatusBar(struct editorConfig* editor, struct abuf* ab)
+void editorDrawStatusBar(struct editorConfig* editor,
+                         struct abuf* ab)
 {
     abAppend(ab, "\x1b[7m", 4);
     char status[80], rstatus[80];
 
-    int len =
-        snprintf(status, sizeof(status), "%.20s - %d lines %s",
-                 editor->filename ? editor->filename : "[No Name]", editor->numrows, editor->dirty ? "(modified)" : "");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
-                        editor->syntax ? editor->syntax->filetype : "no ft", editor->cy + 1, editor->numrows, editor->cx,
-                        editor->row ? editor->row[editor->cy].size : 0);
+    int len = snprintf(
+        status, sizeof(status), "%.20s - %d lines %s",
+        editor->filename ? editor->filename : "[No Name]",
+        editor->numrows, editor->dirty ? "(modified)" : "");
+    int rlen = snprintf(
+        rstatus, sizeof(rstatus), "%s | %d/%d | %d/%d",
+        editor->syntax ? editor->syntax->filetype : "no ft",
+        editor->cy + 1, editor->numrows, editor->cx,
+        editor->row ? editor->row[editor->cy].size : 0);
 
     if (len > editor->screencols)
         len = editor->screencols;
@@ -170,7 +191,8 @@ void editorDrawStatusBar(struct editorConfig* editor, struct abuf* ab)
     abAppend(ab, "\r\n", 2);
 }
 
-void editorDrawMessageBar(struct editorConfig* editor, struct abuf* ab)
+void editorDrawMessageBar(struct editorConfig* editor,
+                          struct abuf* ab)
 {
     abAppend(ab, "\x1b[K", 3);
     int msglen = strlen(editor->statusmsg);
@@ -194,8 +216,10 @@ void editorRefreshScreen(struct editorConfig* editor)
     editorDrawMessageBar(editor, &ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", editor->cy - editor->rowoff + 1,
-             editor->rx - editor->coloff + 1 + editor->num_width + 1);
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH",
+             editor->cy - editor->rowoff + 1,
+             editor->rx - editor->coloff + 1 +
+                 editor->num_width + 1);
     abAppend(&ab, buf, strlen(buf));
 
     abAppend(&ab, "\x1b[?25h", 6);
@@ -204,11 +228,13 @@ void editorRefreshScreen(struct editorConfig* editor)
     abFree(&ab);
 }
 
-void editorSetStatusMessage(struct editorConfig* editor, const char* fmt, ...)
+void editorSetStatusMessage(struct editorConfig* editor,
+                            const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    vsnprintf(editor->statusmsg, sizeof(editor->statusmsg), fmt, ap);
+    vsnprintf(editor->statusmsg, sizeof(editor->statusmsg),
+              fmt, ap);
     va_end(ap);
     editor->statusmsg_time = time(NULL);
 }

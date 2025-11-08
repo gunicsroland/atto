@@ -8,7 +8,8 @@ void editorInsertChar(struct editorConfig* editor, int c)
     {
         editorInsertRow(editor, editor->numrows, "", 0);
     }
-    editorRowInsertChar(editor, &editor->row[editor->cy], editor->cx, c);
+    editorRowInsertChar(editor, &editor->row[editor->cy],
+                        editor->cx, c);
     editor->cx++;
 }
 
@@ -28,7 +29,9 @@ void editorDelChar(struct editorConfig* editor)
     else
     {
         editor->cx = editor->row[editor->cy - 1].size;
-        editorRowAppendString(editor, &editor->row[editor->cy - 1], row->chars, row->size);
+        editorRowAppendString(editor,
+                              &editor->row[editor->cy - 1],
+                              row->chars, row->size);
         editorDelRow(editor, editor->cy);
         editor->cy--;
     }
@@ -43,7 +46,9 @@ void editorInsertNewLine(struct editorConfig* editor)
     else
     {
         erow* row = &editor->row[editor->cy];
-        editorInsertRow(editor, editor->cy + 1, &row->chars[editor->cx], row->size - editor->cx);
+        editorInsertRow(editor, editor->cy + 1,
+                        &row->chars[editor->cx],
+                        row->size - editor->cx);
         row = &editor->row[editor->cy];
         row->size = editor->cx;
         row->chars[row->size] = '\0';
@@ -54,13 +59,16 @@ void editorInsertNewLine(struct editorConfig* editor)
     if (editor->cy >= 0)
     {
         tabs = 0;
-        for (int j = 0; j < editor->row[editor->cy].size; j++)
+        for (int j = 0; j < editor->row[editor->cy].size;
+             j++)
             if (editor->row[editor->cy].chars[j] == '\t')
                 tabs++;
 
         for (int j = 0; j < tabs; j++)
         {
-            editorRowInsertChar(editor, &editor->row[editor->cy + 1], 0, '\t');
+            editorRowInsertChar(
+                editor, &editor->row[editor->cy + 1], 0,
+                '\t');
         }
     }
 

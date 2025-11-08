@@ -13,7 +13,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-char* editorPrompt(struct editorConfig* editor, char* prompt, void (*callback)(struct editorConfig*,char*, int))
+char* editorPrompt(struct editorConfig* editor,
+                   char* prompt,
+                   void (*callback)(struct editorConfig*,
+                                    char*, int))
 {
     size_t bufsize = 128;
     char* buf = malloc(bufsize);
@@ -27,7 +30,8 @@ char* editorPrompt(struct editorConfig* editor, char* prompt, void (*callback)(s
         editorRefreshScreen(editor);
 
         int c = editorReadKey();
-        if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE)
+        if (c == DEL_KEY || c == CTRL_KEY('h') ||
+            c == BACKSPACE)
         {
             if (buflen != 0)
                 buf[--buflen] = '\0';
@@ -68,7 +72,9 @@ char* editorPrompt(struct editorConfig* editor, char* prompt, void (*callback)(s
 
 void editorMoveCursor(struct editorConfig* editor, int key)
 {
-    erow* row = (editor->cy < editor->numrows) ? &editor->row[editor->cy] : NULL;
+    erow* row = (editor->cy < editor->numrows)
+                    ? &editor->row[editor->cy]
+                    : NULL;
 
     switch (key)
     {
@@ -100,7 +106,9 @@ void editorMoveCursor(struct editorConfig* editor, int key)
         break;
     }
 
-    row = (editor->cy < editor->numrows) ? &editor->row[editor->cy] : NULL;
+    row = (editor->cy < editor->numrows)
+              ? &editor->row[editor->cy]
+              : NULL;
     int rowlen = row ? row->size : 0;
     if (editor->cx > rowlen)
         editor->cx = rowlen;
@@ -120,9 +128,11 @@ void editorProcessKeypress(struct editorConfig* editor)
     case CTRL_KEY('q'):
         if (editor->dirty && quit_times > 0)
         {
-            editorSetStatusMessage(editor, "Warning! File ha unsaved changes. "
-                                   "Press ^Q %d more times to quit.",
-                                   quit_times);
+            editorSetStatusMessage(
+                editor,
+                "Warning! File ha unsaved changes. "
+                "Press ^Q %d more times to quit.",
+                quit_times);
             quit_times--;
             return;
         }
@@ -173,14 +183,17 @@ void editorProcessKeypress(struct editorConfig* editor)
         }
         else if (c == PAGE_DOWN)
         {
-            editor->cy = editor->rowoff + editor->screenrows - 1;
+            editor->cy =
+                editor->rowoff + editor->screenrows - 1;
             if (editor->cy > editor->numrows)
                 editor->cy = editor->numrows;
         }
 
         int times = editor->screenrows;
         while (times--)
-            editorMoveCursor(editor, c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+            editorMoveCursor(editor, c == PAGE_UP
+                                         ? ARROW_UP
+                                         : ARROW_DOWN);
     }
     break;
 
@@ -195,21 +208,27 @@ void editorProcessKeypress(struct editorConfig* editor)
         editorFindLine(editor);
     case '\x1b':
         break;
-        
+
     case CTRL_KEY('j'):
-        if(current_editor > 0){
+        if (current_editor > 0)
+        {
             current_editor--;
         }
-        editorSetStatusMessage(&Editors[current_editor], "Switched to editor %d", current_editor + 1);
+        editorSetStatusMessage(&Editors[current_editor],
+                               "Switched to editor %d",
+                               current_editor + 1);
         break;
 
     case CTRL_KEY('k'):
-        if(current_editor < editor_num - 1){
+        if (current_editor < editor_num - 1)
+        {
             current_editor++;
         }
-        editorSetStatusMessage(&Editors[current_editor], "Switched to editor %d", current_editor + 1);
+        editorSetStatusMessage(&Editors[current_editor],
+                               "Switched to editor %d",
+                               current_editor + 1);
         break;
-        
+
     default:
         editorInsertChar(editor, c);
         break;

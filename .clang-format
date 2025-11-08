@@ -5,6 +5,6 @@ UseTab: Never
 BreakBeforeBraces: Allman
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-ColumnLimit: 100
+ColumnLimit: 60
 PointerAlignment: Left
 SortIncludes: true
